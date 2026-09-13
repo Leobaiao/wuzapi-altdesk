@@ -1,0 +1,69 @@
+services:
+  wuzapi-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wuzapi-server
+    ports:
+      - "9090:8080"
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=wuzapi-db
+      - RABBITMQ_URL=amqp://wuzapi:${RABBITMQ_PASSWORD:-wuzapi}@wuzapi-rabbitmq:5672/
+    depends_on:
+      wuzapi-db:
+        condition: service_healthy
+      wuzapi-rabbitmq:
+        condition: service_healthy
+    networks:
+      - web-network
+      - wuzapi-internal
+    restart: unless-stopped
+
+  wuzapi-db:
+    image: postgres:16
+    container_name: wuzapi-db
+    environment:
+      POSTGRES_USER: ${DB_USER:-wuzapi}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-wuzapi}
+      POSTGRES_DB: ${DB_NAME:-wuzapi}
+    volumes:
+      - wuzapi_db_data:/var/lib/postgresql/data
+    networks:
+      - wuzapi-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-wuzapi}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  wuzapi-rabbitmq:
+    image: rabbitmq:3-management
+    container_name: wuzapi-rabbitmq
+    hostname: wuzapi-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: wuzapi
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-wuzapi}
+      RABBITMQ_DEFAULT_VHOST: /
+    volumes:
+      - wuzapi_rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - wuzapi-internal
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+networks:
+  web-network:
+    external: true
+  wuzapi-internal:
+    driver: bridge
+
+volumes:
+  wuzapi_db_data:
+  wuzapi_rabbitmq_data:
