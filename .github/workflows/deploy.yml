@@ -55,7 +55,7 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
         run: |
-          scp -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new .env.prod $SSH_USER@$SSH_HOST:/opt/wuzapi/.env
+          scp -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new .env.prod $SSH_USER@$SSH_HOST:/home/deploy/wuzapi/.env
 
       - name: Deploy via SSH
         env:
@@ -67,9 +67,9 @@ jobs:
             set -e
             GH_TOKEN="$1"
             
-            # Ensure /opt/wuzapi exists
-            mkdir -p /opt/wuzapi
-            cd /opt/wuzapi
+            # Ensure /home/deploy/wuzapi exists
+            mkdir -p /home/deploy/wuzapi
+            cd /home/deploy/wuzapi
 
             REPO_URL="https://x-access-token:${GH_TOKEN}@github.com/Leobaiao/wuzapi-altdesk.git"
 
