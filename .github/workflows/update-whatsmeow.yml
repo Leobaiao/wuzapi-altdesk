@@ -1,0 +1,38 @@
+name: Auto Update Whatsmeow
+
+on:
+  schedule:
+    # Rodar todo dia 1 de cada mês às 03:00 da manhã
+    - cron: '0 3 1 * *'
+  workflow_dispatch: # Permite rodar manualmente pelo GitHub
+
+jobs:
+  update-whatsmeow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+
+      - name: Update whatsmeow module
+        run: |
+          go get -u go.mau.fi/whatsmeow
+          go mod tidy
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --exit-code || echo "changes=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and Push changes
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add go.mod go.sum
+          git commit -m "chore: auto-update whatsmeow to latest version [skip ci]"
+          git push
