@@ -185,6 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('pairphoneinput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
+      const pairPhoneInput = document.getElementById('pairphoneinput');
       const phone = pairPhoneInput.value.trim();
       if (phone) {
         connect().then((data) => {
