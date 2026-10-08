@@ -23,10 +23,8 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      - name: Configure known_hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+      - name: Prepare ~/.ssh
+        run: mkdir -p ~/.ssh
 
       - name: Generate .env file locally
         run: |
