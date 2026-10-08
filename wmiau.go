@@ -22,6 +22,7 @@ import (
 	"github.com/patrickmn/go-cache"
 	"github.com/rs/zerolog/log"
 	"github.com/skip2/go-qrcode"
+	"google.golang.org/protobuf/proto"
 	"go.mau.fi/whatsmeow"
 	"go.mau.fi/whatsmeow/appstate"
 	"go.mau.fi/whatsmeow/proto/waCompanionReg"
@@ -408,6 +409,7 @@ func (s *server) startClient(userID string, textjid string, token string, subscr
 	clientManager.SetWhatsmeowClient(userID, client)
 
 	store.DeviceProps.PlatformType = waCompanionReg.DeviceProps_DESKTOP.Enum()
+	store.DeviceProps.RequireFullSync = proto.Bool(false)
 	store.DeviceProps.Os = osName
 
 	mycli := MyClient{client, 1, userID, token, subscriptions, s.db, s}
