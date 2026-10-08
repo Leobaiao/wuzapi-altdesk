@@ -50,14 +50,14 @@ jobs:
 
       - name: Upload .env to server
         env:
-          SSH_HOST: "191.252.197.149"
+          SSH_HOST: "191.252.110.173"
           SSH_USER: "deploy"
         run: |
           scp -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new .env.prod $SSH_USER@$SSH_HOST:/home/deploy/wuzapi/.env
 
       - name: Deploy via SSH
         env:
-          SSH_HOST: "191.252.197.149"
+          SSH_HOST: "191.252.110.173"
           SSH_USER: "deploy"
           GH_TOKEN: ${{ github.token }}
         run: |
