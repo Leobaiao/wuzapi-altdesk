@@ -43,7 +43,7 @@ jobs:
           DB_PORT=5432
           DB_SSLMODE=false
           TZ=America/Sao_Paulo
-          RABBITMQ_PASSWORD=${{ secrets.DB_PASSWORD }}
+          RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }}
           RABBITMQ_QUEUE=whatsapp_events
           ENVEOF
           sed -i 's/^[[:space:]]*//' .env.prod
@@ -90,8 +90,9 @@ jobs:
             docker network create web-network 2>/dev/null || true
 
             # Build and deploy
-            docker compose -f docker-compose.prod.yml build --no-cache
-            docker compose -f docker-compose.prod.yml up -d
+            # -p fixa o projeto original (containers/volumes existentes)
+            docker compose -p wuzapi-altdesk -f docker-compose.prod.yml build --no-cache
+            docker compose -p wuzapi-altdesk -f docker-compose.prod.yml up -d
 
             # Wait for health
             echo "Aguardando inicialização da WuzAPI..."
