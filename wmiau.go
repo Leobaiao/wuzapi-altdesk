@@ -397,6 +397,16 @@ func (s *server) startClient(userID string, textjid string, token string, subscr
 
 	clientLog := waLog.Stdout("Client", *waDebug, *colorOutput)
 
+	// Atualiza a versão do WhatsApp Web (a embutida na lib pode estar obsoleta -> ClientOutdated)
+	vctx, vcancel := context.WithTimeout(context.Background(), 10*time.Second)
+	if latest, verr := whatsmeow.GetLatestVersion(vctx, nil); verr != nil {
+		log.Warn().Err(verr).Str("current", store.GetWAVersion().String()).Msg("Could not fetch latest WhatsApp web version")
+	} else {
+		store.SetWAVersion(*latest)
+		log.Info().Str("version", latest.String()).Msg("Using latest WhatsApp web version")
+	}
+	vcancel()
+
 	// Create the client with initialized deviceStore
 	var client *whatsmeow.Client
 	if *waDebug != "" {
