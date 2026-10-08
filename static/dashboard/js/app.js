@@ -1188,10 +1188,20 @@ function populateInstances(instances) {
     tableBody.append(nodatarow);
   }
   instances.forEach(instance => {
+  let companyName = "Not Assigned (Free)";
+  if (instance.name.startsWith('altdesk_FREE_')) {
+      companyName = "Pool (Livre)";
+  } else if (instance.name.startsWith('altdesk_')) {
+      const parts = instance.name.split('_');
+      if (parts.length >= 3) {
+          companyName = parts.slice(1, parts.length - 1).join(' ');
+      }
+  }
 
   const row = `
       <tr>
         <td>${instance.id}</td>
+        <td><b>${companyName}</b></td>
         <td>${instance.name}</td>
         <td><i class="${instance.connected ? 'check green' : 'times red'} icon"></i> <span class="status ${instance.connected}">${instance.connected ? 'Yes' : 'No'}</span></td>
         <td><i class="${instance.loggedIn ? 'check green' : 'times red'} icon"></i> <span class="status ${instance.loggedIn}">${instance.loggedIn ? 'Yes' : 'No'}</span></td>
@@ -1214,7 +1224,7 @@ function populateInstances(instances) {
                   <!-- Left Column - Instance Info -->
                   <div class="column">
                       <div class="header" style="font-size: 1.3em; margin-bottom: 0.5rem;">
-                          ${instance.name}
+                          ${companyName} <span style="font-size: 0.7em; color: gray;">(${instance.name})</span>
                           <div class="ui labels" style="margin-top: 0.5em;">
                               <div class="ui ${instance.connected ? 'green' : 'red'} horizontal label">
                                   <i class="${instance.connected ? 'check' : 'times'} icon"></i>
